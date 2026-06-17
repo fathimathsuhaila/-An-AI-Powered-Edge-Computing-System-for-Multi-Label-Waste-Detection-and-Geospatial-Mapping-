@@ -1,0 +1,150 @@
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:introduction_screen/introduction_screen.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'home_screen.dart';
+
+class OnboardingScreen extends StatelessWidget {
+  const OnboardingScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8F9FA), // Clean off-white base
+      body: Stack(
+        children: [
+          // 1. THE FROSTED BIO-SPHERE BACKGROUND
+          const FrostedBioSphereBackground(),
+
+          // 2. THE TUTORIAL PAGES
+          IntroductionScreen(
+            globalBackgroundColor: Colors.transparent,
+            scrollPhysics: const BouncingScrollPhysics(),
+            pages: [
+              // PAGE 1: WELCOME
+              PageViewModel(
+                title: "Welcome to Eco Scan",
+                body: "Join the movement to keep our planet clean. Your smart companion for a greener tomorrow.",
+                image: Center(
+                  child: const Icon(Icons.public, size: 140, color: Colors.teal)
+                      .animate(onPlay: (c) => c.repeat(reverse: true))
+                      .moveY(begin: -10, end: 10, duration: 2.seconds)
+                      .shimmer(duration: 3.seconds, color: Colors.white70),
+                ),
+                decoration: _pageDecoration(),
+              ),
+
+              // PAGE 2: AI SCANNER
+              PageViewModel(
+                title: "AI Waste Scanner",
+                body: "Point your camera at any waste. Our AI will instantly identify the material and tell you how to recycle it.",
+                image: Center(
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      const Icon(Icons.crop_free_rounded, size: 160, color: Colors.green)
+                          .animate(onPlay: (c) => c.repeat(reverse: true))
+                          .scaleXY(begin: 0.95, end: 1.05, duration: 1.5.seconds),
+                      const Icon(Icons.recycling_rounded, size: 80, color: Colors.teal)
+                          .animate(onPlay: (c) => c.repeat())
+                          .rotate(duration: 4.seconds),
+                    ],
+                  ),
+                ),
+                decoration: _pageDecoration(),
+              ),
+
+              // PAGE 3: MAPS (UPDATED)
+              PageViewModel(
+                title: "Map & Report Litter",
+                body: "Help clean the community! Log litter hotspots for others to clean, or find the closest recycling centers near you.",
+                image: Center(
+                  child: const Icon(Icons.location_on_rounded, size: 140, color: Colors.blueAccent)
+                      .animate(onPlay: (c) => c.repeat(reverse: true))
+                      .moveY(begin: 0, end: -20, duration: 1.seconds, curve: Curves.easeOutQuad),
+                ),
+                decoration: _pageDecoration(),
+              ),
+            ],
+
+            onDone: () => _goToNextScreen(context),
+            onSkip: () => _goToNextScreen(context),
+            showSkipButton: true,
+            skip: const Text("Skip", style: TextStyle(fontWeight: FontWeight.w800, color: Colors.teal)),
+            next: const Icon(Icons.arrow_forward_ios, color: Colors.teal),
+            done: const Text("Get Started", style: TextStyle(fontWeight: FontWeight.w900, color: Colors.teal, fontSize: 16)),
+
+            dotsDecorator: DotsDecorator(
+              size: const Size.square(10.0),
+              activeSize: const Size(24.0, 10.0),
+              activeColor: Colors.teal,
+              color: Colors.teal.withValues(alpha: 0.3),
+              spacing: const EdgeInsets.symmetric(horizontal: 4.0),
+              activeShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.0)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _goToNextScreen(BuildContext context) {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
+    );
+  }
+
+  PageDecoration _pageDecoration() {
+    return const PageDecoration(
+      pageColor: Colors.transparent,
+      titleTextStyle: TextStyle(fontSize: 32.0, fontWeight: FontWeight.w900, color: Colors.black87),
+      bodyTextStyle: TextStyle(fontSize: 17.0, color: Colors.black87, height: 1.5, fontWeight: FontWeight.w500),
+      imagePadding: EdgeInsets.only(top: 100, bottom: 20),
+      bodyPadding: EdgeInsets.symmetric(horizontal: 24),
+    );
+  }
+}
+
+// =========================================================================
+// CUSTOM WIDGET: Frosted Bio-Sphere (Glassmorphism)
+// =========================================================================
+class FrostedBioSphereBackground extends StatelessWidget {
+  const FrostedBioSphereBackground({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Center(
+          child: Container(
+            width: 350,
+            height: 350,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.greenAccent.shade400,
+                  Colors.blueAccent.shade400,
+                ],
+              ),
+            ),
+          ).animate(onPlay: (c) => c.repeat(reverse: true))
+           .scaleXY(begin: 0.85, end: 1.15, duration: 6.seconds, curve: Curves.easeInOut)
+           .move(begin: const Offset(-20, -20), end: const Offset(20, 20), duration: 8.seconds, curve: Curves.easeInOut)
+           .rotate(duration: 15.seconds),
+        ),
+
+        Positioned.fill(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 60, sigmaY: 60),
+            child: Container(
+              color: Colors.white.withValues(alpha: 0.4),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
